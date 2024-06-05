@@ -23,6 +23,10 @@ This GitHub Action builds an Owlcat Mod project and outputs relevant build infor
 
 **Optional** The account which owns the package. Default: `xADDBx`
 
+### `BRANCH_REF`
+
+**Optional** Ref (e.g., branch, tag, SHA) which is checked out. Default: `null`
+
 ## Outputs
 
 ### `zipFile`
@@ -53,5 +57,4 @@ with:
   GAME_NAME: Wrath
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GITHUB_NAME: ${{ github.repository_owner }}
-  PACKAGE_OWNER: xADDBx
 ```

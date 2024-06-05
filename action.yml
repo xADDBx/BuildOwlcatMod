@@ -26,6 +26,10 @@ inputs:
     description: 'Account which owns package.'
     required: false
     default: 'xADDBx'
+  BRANCH_REF:
+    description: 'Ref (e.g., branch, tag, SHA) to checkout.'
+    required: false
+    default: null
 
 outputs:
   zipFile:
@@ -44,6 +48,8 @@ runs:
   steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.BRANCH_REF }}
 
     - name: Set up .NET
       uses: actions/setup-dotnet@v4
@@ -73,8 +79,6 @@ runs:
         $versionNumber = [regex]::Match($subdirectory, '\d+\.\d+\.\d+').Value
         $fullPath = Join-Path -Path $prefixPath -ChildPath $subdirectory
         echo "fullPath=$fullPath" >> $env:GITHUB_ENV
-        echo "gameVersionSuffix=$versionSuffix" >> $env:GITHUB_ENV
-        echo "gameVersionNum=$versionNumber" >> $env:GITHUB_ENV
         echo "gameVersionNum=$versionNumber" >> $GITHUB_OUTPUT
         echo "gameVersionSuffix=$versionSuffix" >> $GITHUB_OUTPUT
 
@@ -89,8 +93,6 @@ runs:
         $zipFileObject = Get-ChildItem -Recurse -Path $prefixPath -Filter "*.zip" | Where-Object { $_.Directory.Name -eq 'Out' } | Select-Object -First 1
         $zipFile = $zipFileObject.BaseName
         $zipFilePath = (Get-Item $zipFileObject.FullName).Directory.FullName
-        echo "zipFile=$zipFile" >> $env:GITHUB_ENV
-        echo "zipFilePath=$zipFilePath" >> $env:GITHUB_ENV
         echo "zipFile=$zipFile" >> $GITHUB_OUTPUT
         echo "zipFilePath=$zipFilePath" >> $GITHUB_OUTPUT
         $outDir = Join-Path -Path $zipFilePath -ChildPath 'Bin'
