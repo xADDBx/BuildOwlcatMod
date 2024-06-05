@@ -28,6 +28,7 @@ This GitHub Action builds an Owlcat Mod project and outputs relevant build infor
 **Optional** Ref (e.g., branch, tag, SHA) which is checked out. Default: `null`
 
 ## Outputs
+Because I couldn't get normal outputs to work the output is in the env object.
 
 ### `zipFile`
 
