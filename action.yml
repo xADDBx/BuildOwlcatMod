@@ -87,8 +87,8 @@ runs:
         $versionNumber = [regex]::Match($subdirectory, '\d+\.\d+\.\d+').Value
         $fullPath = Join-Path -Path $prefixPath -ChildPath $subdirectory
         echo "fullPath=$fullPath" >> $env:GITHUB_ENV
-        echo "gameVersionNum=$versionNumber" >> $GITHUB_ENV
-        echo "gameVersionSuffix=$versionSuffix" >> $GITHUB_ENV
+        echo "gameVersionNum=$versionNumber" >> $env:GITHUB_ENV
+        echo "gameVersionSuffix=$versionSuffix" >> $env:GITHUB_ENV
 
     - name: Build Project
       shell: pwsh
@@ -102,7 +102,7 @@ runs:
         $zipFileObject = Get-ChildItem -Recurse -Path $prefixPath -Filter "*.zip" | Where-Object { $_.Directory.Name -eq 'Out' } | Select-Object -First 1
         $zipFile = $zipFileObject.BaseName
         $zipFilePath = (Get-Item $zipFileObject.FullName).Directory.FullName
-        echo "zipFile=$zipFile" >> $GITHUB_ENV
-        echo "zipFilePath=$zipFilePath" >> $GITHUB_ENV
+        echo "zipFile=$zipFile" >> $env:GITHUB_ENV
+        echo "zipFilePath=$zipFilePath" >> $env:GITHUB_ENV
         $outDir = Join-Path -Path $zipFilePath -ChildPath 'Bin'
-        echo "outDir=$outDir" >> $GITHUB_ENV
+        echo "outDir=$outDir" >> $env:GITHUB_ENV
