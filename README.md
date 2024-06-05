@@ -13,7 +13,7 @@ This GitHub Action builds an Owlcat Mod project and outputs relevant build infor
 
 ### `GITHUB_TOKEN`
 
-**Required** The GitHub token for accessing the package registry. Default: `${{ secrets.GITHUB_TOKEN }}`
+**Required** The GitHub token for accessing the package registry.
 
 ### `GITHUB_NAME`
 

@@ -6,7 +6,6 @@ inputs:
   GAME_NAME:
     description: 'Name of the game which the mod targets'
     required: true
-    type: choice
     default: Wrath
     options:
       - Kingmaker
@@ -15,7 +14,6 @@ inputs:
   GITHUB_TOKEN:
     description: 'GitHub token for accessing the package registry.'
     required: true
-    default: '${{ secrets.GITHUB_TOKEN }}'
   GITHUB_NAME:
     description: 'Account used to connect to package registry.'
     required: false
@@ -24,7 +22,6 @@ inputs:
     description: 'Account which owns package.'
     required: false
     default: 'xADDBx'
-  
 
 outputs:
   zipFile:
@@ -71,13 +68,11 @@ runs:
         $versionSuffix = [regex]::Match($subdirectory, '(?<=\d+\.\d+\.\d+-).+$').Value
         $versionNumber = [regex]::Match($subdirectory, '\d+\.\d+\.\d+').Value
         $fullPath = Join-Path -Path $prefixPath -ChildPath $subdirectory
-        $currentDirName = Split-Path -Path $currentPath -Leaf
-        echo "currentDirName=$currentDirName" >> $env:GITHUB_ENV
         echo "fullPath=$fullPath" >> $env:GITHUB_ENV
         echo "gameVersionSuffix=$versionSuffix" >> $env:GITHUB_ENV
         echo "gameVersionNum=$versionNumber" >> $env:GITHUB_ENV
-        echo "::set-output name=gameVersionNum::$versionNumber"
-        echo "::set-output name=gameVersionSuffix::$versionSuffix"
+        echo "gameVersionNum=$versionNumber" >> $GITHUB_OUTPUT
+        echo "gameVersionSuffix=$versionSuffix" >> $GITHUB_OUTPUT
 
     - name: Build Project
       run: msbuild /p:Configuration=Release /p:${{ inputs.GAME_NAME }}Data="${{ env.fullPath }}\UserDataDir" /p:${{ inputs.GAME_NAME }}InstallDir="${{ env.fullPath }}\Assemblies" /p:OutputPath=Out\Bin
@@ -92,7 +87,7 @@ runs:
         $zipFilePath = (Get-Item $zipFileObject.FullName).Directory.FullName
         echo "zipFile=$zipFile" >> $env:GITHUB_ENV
         echo "zipFilePath=$zipFilePath" >> $env:GITHUB_ENV
-        echo "::set-output name=zipFile::$zipFile"
-        echo "::set-output name=zipFilePath::$zipFilePath"
+        echo "zipFile=$zipFile" >> $GITHUB_OUTPUT
+        echo "zipFilePath=$zipFilePath" >> $GITHUB_OUTPUT
         $outDir = Join-Path -Path $zipFilePath -ChildPath 'Bin'
-        echo "::set-output name=outDir::$outDir"
+        echo "outDir=$outDir" >> $GITHUB_OUTPUT
