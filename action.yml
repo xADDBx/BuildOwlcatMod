@@ -2,6 +2,10 @@ name: 'Build Owlcat Mod'
 description: 'Builds an Owlcat Mod project and outputs relevant build information.'
 author: 'xADDBx'
 
+branding:
+  icon: 'code'
+  color: 'black'
+
 inputs:
   GAME_NAME:
     description: 'Name of the game which the mod targets'
