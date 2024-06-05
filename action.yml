@@ -89,6 +89,8 @@ runs:
         echo "fullPath=$fullPath" >> $env:GITHUB_ENV
         echo "gameVersionNum=$versionNumber" >> $GITHUB_OUTPUT
         echo "gameVersionSuffix=$versionSuffix" >> $GITHUB_OUTPUT
+        echo "$versionNumber"
+        echo "$versionSuffix"
 
     - name: Build Project
       shell: pwsh
@@ -106,3 +108,6 @@ runs:
         echo "zipFilePath=$zipFilePath" >> $GITHUB_OUTPUT
         $outDir = Join-Path -Path $zipFilePath -ChildPath 'Bin'
         echo "outDir=$outDir" >> $GITHUB_OUTPUT
+        echo "$zipFile"
+        echo "$outDir"
+        echo "$zipFilePath"
