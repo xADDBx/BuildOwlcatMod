@@ -57,7 +57,6 @@ runs:
         dotnet-version: '8.0.x'
 
     - name: Setup MSBuild.exe
-      shell: pwsh
       uses: microsoft/setup-msbuild@v2
 
     - name: Add NuGet Source
