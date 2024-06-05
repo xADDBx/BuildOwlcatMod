@@ -1,0 +1,6 @@
+title: Build Owlcat Mod
+description: This GitHub Action builds an Owlcat Mod project and outputs relevant build information.
+author: xADDBx
+categories:
+  - CI/CD
+  - Utilities
