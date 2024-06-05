@@ -57,15 +57,19 @@ runs:
         dotnet-version: '8.0.x'
 
     - name: Setup MSBuild.exe
+      shell: pwsh
       uses: microsoft/setup-msbuild@v2
 
     - name: Add NuGet Source
+      shell: pwsh
       run: nuget sources add -name github -source https://nuget.pkg.github.com/${{ inputs.PACKAGE_OWNER }}/index.json -username ${{ inputs.GITHUB_NAME }} -password ${{ inputs.GITHUB_TOKEN }} -StorePasswordInClearText -Verbosity detailed
 
     - name: Install NuGet package
+      shell: pwsh
       run: nuget install ${{ inputs.GAME_NAME }}GameAssemblies -Source github -OutputDirectory GameFiles -DependencyVersion Highest -DirectDownload -PreRelease -Verbosity detailed
 
     - name: Restore
+      shell: pwsh
       run: dotnet restore
 
     - name: Find subdirectory
@@ -83,6 +87,7 @@ runs:
         echo "gameVersionSuffix=$versionSuffix" >> $GITHUB_OUTPUT
 
     - name: Build Project
+      shell: pwsh
       run: msbuild /p:Configuration=Release /p:${{ inputs.GAME_NAME }}Data="${{ env.fullPath }}\UserDataDir" /p:${{ inputs.GAME_NAME }}InstallDir="${{ env.fullPath }}\Assemblies" /p:OutputPath=Out\Bin
 
     - name: Find zip file
