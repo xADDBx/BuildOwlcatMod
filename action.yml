@@ -82,21 +82,41 @@ runs:
       run: |
         $links = "${{ inputs.DEPENDENCY_LINKS }}"
         $names = "${{ inputs.DEPENDENCY_NAMES }}"
+
+        Write-Output "DEBUG: Links provided: $links"
+        Write-Output "DEBUG: Names provided: $names"
+
         if (-not [string]::IsNullOrEmpty($links) -and -not [string]::IsNullOrEmpty($names)) {
           $linksArray = $links -split ","
           $namesArray = $names -split ","
+
+          Write-Output "DEBUG: Links array: $($linksArray -join ', ')"
+          Write-Output "DEBUG: Names array: $($namesArray -join ', ')"
+
           if ($linksArray.Length -ne $namesArray.Length) {
             Write-Error "The number of links and names must be the same"
             exit 1
           }
+
           for ($i = 0; $i -lt $linksArray.Length; $i++) {
+            Write-Output "DEBUG: Downloading from: $($linksArray[$i])"
             Invoke-WebRequest -Uri $($linksArray[$i]) -OutFile "dep.zip"
-            $destinationPath = Join-Path -Path "{{ env.fullPath }}\Assemblies" -ChildPath $($namesArray[$i])        
+            $destinationPath = Join-Path -Path "${{ env.fullPath }}\Assemblies" -ChildPath $($namesArray[$i])
+
+            Write-Output "DEBUG: Destination path: $destinationPath"
+
             if (-not (Test-Path -Path $destinationPath)) {
+              Write-Output "DEBUG: Creating directory: $destinationPath"
               New-Item -ItemType Directory -Path $destinationPath -Force | Out-Null
+            } else {
+              Write-Output "DEBUG: Directory already exists: $destinationPath"
             }
+
+            Write-Output "DEBUG: Extracting dep.zip to $destinationPath"
             Expand-Archive -Path "dep.zip" -DestinationPath $destinationPath -Force
           }
+        } else {
+          Write-Output "DEBUG: No links or names provided"
         }
 
     - name: Build Project
