@@ -114,6 +114,15 @@ runs:
 
             Write-Output "DEBUG: Extracting dep.zip to $destinationPath"
             Expand-Archive -Path "dep.zip" -DestinationPath $destinationPath -Force
+            topLevelDirs = Get-ChildItem -Path $destinationPath -Directory
+            if ($topLevelDirs.Count -eq 1) {
+              $topLevelDir = $topLevelDirs[0]
+              Write-Output "DEBUG: Found single top-level directory: $($topLevelDir.Name)"
+              $contentPath = Join-Path -Path $destinationPath -ChildPath "*"
+              Move-Item -Path "$($topLevelDir.FullName)\*" -Destination $destinationPath -Force
+              Remove-Item -Path $topLevelDir.FullName -Force -Recurse
+              Write-Output "DEBUG: Moved contents of $($topLevelDir.Name) to $destinationPath"
+            }
           }
         } else {
           Write-Output "DEBUG: No links or names provided"
