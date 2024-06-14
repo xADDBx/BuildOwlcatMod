@@ -114,7 +114,7 @@ runs:
 
             Write-Output "DEBUG: Extracting dep.zip to $destinationPath"
             Expand-Archive -Path "dep.zip" -DestinationPath $destinationPath -Force
-            topLevelDirs = Get-ChildItem -Path $destinationPath -Directory
+            $topLevelDirs = Get-ChildItem -Path $destinationPath -Directory
             if ($topLevelDirs.Count -eq 1) {
               $topLevelDir = $topLevelDirs[0]
               Write-Output "DEBUG: Found single top-level directory: $($topLevelDir.Name)"
