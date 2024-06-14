@@ -97,7 +97,7 @@ runs:
             Invoke-WebRequest -Uri $($linksArray[$i]) -OutFile "dep.zip"
             $destinationPath = Join-Path -Path "{{ env.fullPath }}\Assemblies" -ChildPath $($namesArray[$i])        
             if (-not (Test-Path -Path $destinationPath)) {
-              New-Item -ItemType Directory -Path $destinationPath | Out-Null
+              New-Item -ItemType Directory -Path $destinationPath -Force | Out-Null
             }
             Expand-Archive -Path "dep.zip" -DestinationPath $destinationPath -Force
           }
