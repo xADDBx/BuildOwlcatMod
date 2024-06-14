@@ -1,6 +1,8 @@
 # Build Owlcat Mod
 
-This GitHub Action builds an Owlcat Mod project and outputs relevant build information.
+This GitHub Action builds an Owlcat Mod project and outputs relevant build information.  
+This action assumes that a zip directory conatining the build files will be created during the build process, e.g. via  
+`<ZipDirectory SourceDirectory="$(MSBuildProjectDirectory)\$(OutputPath)" DestinationFile="$(MSBuildProjectDirectory)\$(OutputPath)\..\$(AssemblyName)-$(Version).zip" Overwrite="true" />`
 
 # Inputs
 
@@ -26,6 +28,14 @@ This GitHub Action builds an Owlcat Mod project and outputs relevant build infor
 ### `BRANCH_REF`
 
 **Optional** Ref (e.g., branch, tag, SHA) which is checked out. Default: `null`
+
+### `DEPENDENCY_LINKS`:
+
+**Optional** Comma-separated list of direct download links to dependencies. Default: ''
+
+### `DEPENDENCY_NAMES`:
+
+**Optional** Comma-separated list of directory names in which the downloaded files will be put. Default: ''
 
 ## Outputs
 Because I couldn't get normal outputs to work the output is in the env object.
