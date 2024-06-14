@@ -30,6 +30,14 @@ inputs:
     description: 'Ref (e.g., branch, tag, SHA) to checkout.'
     required: false
     default: null
+  DEPENDENCY_LINKS:
+    description: 'Comma-separated list of direct download links to dependencies'
+    required: false
+    default: ''
+  DEPENDENCY_NAMES:
+    description: 'Comma-separated list of directory names in which the downloaded files will be put'
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -72,6 +80,28 @@ runs:
         echo "fullPath=$fullPath" >> $env:GITHUB_ENV
         echo "gameVersionNum=$(echo $versionNumber)" >> $env:GITHUB_ENV
         echo "gameVersionSuffix=$(echo $versionSuffix)" >> $env:GITHUB_ENV
+
+    - name: Install Dependencies
+      shell: pwsh
+      run: |
+        $links = "${{ inputs.links }}"
+        $names = "${{ inputs.names }}"
+        if (-not [string]::IsNullOrEmpty($links) -and -not [string]::IsNullOrEmpty($names)) {
+          $linksArray = $links -split ","
+          $namesArray = $names -split ","
+          if ($linksArray.Length -ne $namesArray.Length) {
+            Write-Error "The number of links and names must be the same"
+            exit 1
+          }
+          for ($i = 0; $i -lt $linksArray.Length; $i++) {
+            Invoke-WebRequest -Uri $($linksArray[$i]) -OutFile "dep.zip"
+            $destinationPath = Join-Path -Path "{{ env.fullPath }}\Assemblies" -ChildPath $($namesArray[$i])        
+            if (-not (Test-Path -Path $destinationPath)) {
+              New-Item -ItemType Directory -Path $destinationPath | Out-Null
+            }
+            Expand-Archive -Path "dep.zip" -DestinationPath $destinationPath -Force
+          }
+        }
 
     - name: Build Project
       shell: pwsh
