@@ -63,10 +63,6 @@ runs:
       shell: pwsh
       run: nuget install ${{ inputs.GAME_NAME }}GameAssemblies -Source github -OutputDirectory GameFiles -DependencyVersion Highest -DirectDownload -PreRelease -Verbosity detailed
 
-    - name: Restore
-      shell: pwsh
-      run: dotnet restore
-
     - name: Find subdirectory
       id: find-dir
       shell: pwsh
@@ -105,7 +101,7 @@ runs:
 
     - name: Build Project
       shell: pwsh
-      run: msbuild /p:Configuration=Release /p:${{ inputs.GAME_NAME }}Data="${{ env.fullPath }}\UserDataDir" /p:${{ inputs.GAME_NAME }}InstallDir="${{ env.fullPath }}\Assemblies" /p:OutputPath=Out\Bin
+      run: msbuild -r /p:Configuration=Release /p:${{ inputs.GAME_NAME }}Data="${{ env.fullPath }}\UserDataDir" /p:${{ inputs.GAME_NAME }}InstallDir="${{ env.fullPath }}\Assemblies" /p:OutputPath=Out\Bin
 
     - name: Find zip file
       id: find-zip
