@@ -15,6 +15,7 @@ inputs:
       - Kingmaker
       - Wrath
       - RogueTrader
+      - DarkHeresy
   GITHUB_TOKEN:
     description: 'GitHub token for accessing the package registry.'
     required: true
