@@ -31,6 +31,14 @@ inputs:
     description: 'Ref (e.g., branch, tag, SHA) to checkout.'
     required: false
     default: null
+  DEPENDENCY_LINKS:
+    description: 'Comma-separated list of direct download links to dependencies'
+    required: false
+    default: ''
+  DEPENDENCY_NAMES:
+    description: 'Comma-separated list of directory names in which the downloaded files will be put'
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -56,10 +64,6 @@ runs:
       shell: pwsh
       run: nuget install ${{ inputs.GAME_NAME }}GameAssemblies -Source github -OutputDirectory GameFiles -DependencyVersion Highest -DirectDownload -PreRelease -Verbosity detailed
 
-    - name: Restore
-      shell: pwsh
-      run: dotnet restore
-
     - name: Find subdirectory
       id: find-dir
       shell: pwsh
@@ -67,16 +71,70 @@ runs:
         $currentPath = "${{ github.workspace }}"
         $prefixPath = Join-Path -Path $currentPath -ChildPath 'GameFiles'
         $subdirectory = Get-ChildItem -Path $prefixPath -Directory | Select-Object -First 1 -ExpandProperty Name
-        $versionSuffix = [regex]::Match($subdirectory, '(?<=\d+\.\d+\.\d+-).+$').Value
-        $versionNumber = [regex]::Match($subdirectory, '\d+\.\d+\.\d+').Value
+        $pattern = '(\d+(\.\d+)*)(?:-(.*))?'
+        if ($subdirectory -match $pattern) {
+          $versionNumber = $matches[1]
+          $versionSuffix = $matches[3]
+        }
         $fullPath = Join-Path -Path $prefixPath -ChildPath $subdirectory
         echo "fullPath=$fullPath" >> $env:GITHUB_ENV
         echo "gameVersionNum=$(echo $versionNumber)" >> $env:GITHUB_ENV
         echo "gameVersionSuffix=$(echo $versionSuffix)" >> $env:GITHUB_ENV
 
+    - name: Install Dependencies
+      shell: pwsh
+      run: |
+        $links = "${{ inputs.DEPENDENCY_LINKS }}"
+        $names = "${{ inputs.DEPENDENCY_NAMES }}"
+
+        Write-Output "DEBUG: Links provided: $links"
+        Write-Output "DEBUG: Names provided: $names"
+
+        if (-not [string]::IsNullOrEmpty($links) -and -not [string]::IsNullOrEmpty($names)) {
+          $linksArray = $links -split ","
+          $namesArray = $names -split ","
+
+          Write-Output "DEBUG: Links array: $($linksArray -join ', ')"
+          Write-Output "DEBUG: Names array: $($namesArray -join ', ')"
+
+          if ($linksArray.Length -ne $namesArray.Length) {
+            Write-Error "The number of links and names must be the same"
+            exit 1
+          }
+
+          for ($i = 0; $i -lt $linksArray.Length; $i++) {
+            Write-Output "DEBUG: Downloading from: $($linksArray[$i])"
+            Invoke-WebRequest -Uri $($linksArray[$i]) -OutFile "dep.zip"
+            $destinationPath = Join-Path -Path "${{ env.fullPath }}\Assemblies" -ChildPath $($namesArray[$i])
+
+            Write-Output "DEBUG: Destination path: $destinationPath"
+
+            if (-not (Test-Path -Path $destinationPath)) {
+              Write-Output "DEBUG: Creating directory: $destinationPath"
+              New-Item -ItemType Directory -Path $destinationPath -Force | Out-Null
+            } else {
+              Write-Output "DEBUG: Directory already exists: $destinationPath"
+            }
+
+            Write-Output "DEBUG: Extracting dep.zip to $destinationPath"
+            Expand-Archive -Path "dep.zip" -DestinationPath $destinationPath -Force
+            $topLevelDirs = Get-ChildItem -Path $destinationPath -Directory
+            if ($topLevelDirs.Count -eq 1) {
+              $topLevelDir = $topLevelDirs[0]
+              Write-Output "DEBUG: Found single top-level directory: $($topLevelDir.Name)"
+              $contentPath = Join-Path -Path $destinationPath -ChildPath "*"
+              Move-Item -Path "$($topLevelDir.FullName)\*" -Destination $destinationPath -Force
+              Remove-Item -Path $topLevelDir.FullName -Force -Recurse
+              Write-Output "DEBUG: Moved contents of $($topLevelDir.Name) to $destinationPath"
+            }
+          }
+        } else {
+          Write-Output "DEBUG: No links or names provided"
+        }
+
     - name: Build Project
       shell: pwsh
-      run: msbuild /p:Configuration=Release /p:${{ inputs.GAME_NAME }}Data="${{ env.fullPath }}\UserDataDir" /p:${{ inputs.GAME_NAME }}InstallDir="${{ env.fullPath }}\Assemblies" /p:OutputPath=Out\Bin
+      run: msbuild -r /p:Configuration=Release /p:${{ inputs.GAME_NAME }}Data="${{ env.fullPath }}\UserDataDir" /p:${{ inputs.GAME_NAME }}InstallDir="${{ env.fullPath }}\Assemblies" /p:OutputPath=Out\Bin
 
     - name: Find zip file
       id: find-zip
