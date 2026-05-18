@@ -133,6 +133,12 @@ runs:
           Write-Output "DEBUG: No links or names provided"
         }
 
+    - name: Show compiler info
+      run: |
+        dotnet --info
+        where csc
+        msbuild --info
+
     - name: Build Project
       shell: pwsh
       run: msbuild -r /p:Configuration=Release /p:${{ inputs.GAME_NAME }}Data="${{ env.fullPath }}\UserDataDir" /p:${{ inputs.GAME_NAME }}InstallDir="${{ env.fullPath }}\Assemblies" /p:OutputPath=Out\Bin
