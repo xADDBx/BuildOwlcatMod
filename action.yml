@@ -52,7 +52,7 @@ runs:
       uses: actions/setup-dotnet@af9211b1364d382bc386cd82c6386875ad2ad796
       with:
         dotnet-version: latest
-        dotnet-channel: '11.0'
+        dotnet-quality: preview
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
