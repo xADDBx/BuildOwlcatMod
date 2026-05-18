@@ -49,7 +49,7 @@ runs:
         ref: ${{ inputs.BRANCH_REF }}
 
     - name: Set up .NET
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@af9211b1364d382bc386cd82c6386875ad2ad796
       with:
         dotnet-version: latest
         dotnet-channel: '11.0'
