@@ -44,14 +44,14 @@ runs:
   using: 'composite'
   steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         ref: ${{ inputs.BRANCH_REF }}
 
     - name: Set up .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: 'latest'
+        dotnet-version: latest
         dotnet-channel: '11.0'
 
     - name: Setup MSBuild.exe
