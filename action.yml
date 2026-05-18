@@ -134,6 +134,7 @@ runs:
         }
 
     - name: Show compiler info
+      shell: pwsh
       run: |
         dotnet --info
         where csc
